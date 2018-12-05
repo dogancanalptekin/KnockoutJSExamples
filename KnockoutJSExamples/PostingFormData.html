@@ -1,0 +1,116 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link href="Content/bootstrap.min.css" rel="stylesheet" />
+    <script src="Scripts/knockout-3.4.2.js"></script>
+
+</head>
+<body>
+
+<div class="row">
+    <img id="ajax-loader"
+         src="ajax-loading.gif" style="display:none;width:100px;" />
+    <hr />
+
+    <div id="results" class="alert alert-success" style="display:none;">
+        <h3>Bilgileriniz kayıt edildi.</h3>
+    </div>
+    <div class="col-md-6">
+        <div class="panel panel-primary">
+            <div class="panel-heading"><h4>Sende Davetlisin!</h4></div>
+            <div class="panel-body">
+
+                <form id="DavetiyeForm">
+                    <div class="form-group">
+                        <label>Ad :</label>
+                        <input type="text" id="Ad" name="Ad" class="form-control" data-bind="value:davetiye.ad"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Eposta :</label>
+                        <input type="text" id="Eposta" name="Eposta" class="form-control" data-bind="value:davetiye.eposta"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Katılacak mısın ?</label>
+                        <select id="KatilmaDurumu" name="KatilmaDurumu" class="form-control" data-bind="options: davetiye.optionValues, value: davetiye.katilmaDurumu, optionsValue:'Id', optionsText:'Text'"></select>
+                    </div>
+                    <div class="text-center">
+                        <input class="btn btn-success" type="submit" value="Gönder" data-bind="click.save"/>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-body">
+
+                <div id="DavetiyeForm">
+                    <div class="form-group">
+                        <label>Ad :</label>
+                        <span data-bind="text:davetiye.ad"></span>
+                    </div>
+                    <div class="form-group">
+                        <label>Eposta :</label>
+                        <span data-bind="text:davetiye.eposta"></span>
+                    </div>
+                    <div class="form-group">
+                        <label>Katılacak Mısın? :</label>
+                        <span data-bind="text:davetiye.katilmaDurumu"></span>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script>
+
+        var davetiye = {
+            ad: ko.observable("Adınızı Giriniz"),
+            eposta: ko.observable("Eposta Giriniz"),
+            optionValues: [{ Id: true, Text: "Evet" }, { Id: false, Text: "Hayır" }],
+            katilmaDurumu: ko.observable(true)
+            
+        };
+
+        function davetiyeModel(davetiye) {
+            var self = this;
+            self.davetiye = davetiye;
+            self.save = function() {
+                $.ajax({
+                    url: "http://localhost:59994/api/Davetiye/Ekle",
+                    type: "POST",
+                    data: {
+                        Ad: self.davetiye.ad,
+                        Eposta: self.davetiye.eposta,
+                        KatilmaDurumu: self.davetiye.katilmaDurumu
+                    },
+                    beforeSend: function () {
+                        $("#ajax-loader").show();
+                    },
+                    complete: function () {
+                        $("#ajax-loader").hide();
+                    },
+                    success: function (data) {
+                        $("#results").show();
+
+                    },
+                    error: function () {
+                        alert("hata oluştu");
+                    }
+                });
+            }
+        }
+
+        ko.applyBindings(new davetiyeModel(davetiye));
+    </script>
+
+</body>
+</html>
